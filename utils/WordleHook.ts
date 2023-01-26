@@ -110,12 +110,16 @@ export const useWordle = (solution: string) => {
 
         let arrayActiveTiles = Array.from(activeTiles);
 
+        for (let i = 0; i < solution.length; i++) {
+            formattedGuess[i].state = guessColor(solution, currentGuess, i);
+        }
+
         // const guess = arrayActiveTiles.reduce((acc: string, tile: Element) => {
         //     return acc + tile.getAttribute('data-letter')?.toLowerCase();
         // }, '');
 
         arrayActiveTiles.forEach((...params) => {
-            flipTile(...params, solutionArray, formattedGuess);
+            flipTile(...params, formattedGuess);
         });
     }
 
@@ -193,7 +197,6 @@ export const useWordle = (solution: string) => {
         index: number,
         array: Element[],
         // guess: string,
-        solution: Array<string>,
         formattedGuess: Array<{ key: string; state: string }>
     ) {
         const key = currentGuess[index];
@@ -211,20 +214,22 @@ export const useWordle = (solution: string) => {
             () => {
                 tile.classList.remove('flip');
 
-                if (currentGuess[index] === solution[index]) {
-                    tile.setAttribute('data-state', 'correct');
-                    formattedGuess[index].state = 'correct';
-                    keyboardKey?.classList.add('correct');
-                    solution[index] = 'null';
-                } else if (solution.includes(currentGuess[index])) {
-                    tile.setAttribute('data-state', 'wrong-location');
-                    formattedGuess[index].state = 'wrong-location';
-                    keyboardKey?.classList.add('wrong-location');
-                } else {
-                    tile.setAttribute('data-state', 'wrong');
-                    formattedGuess[index].state = 'wrong';
-                    keyboardKey?.classList.add('wrong');
-                }
+                tile.setAttribute('data-state', formattedGuess[index].state);
+                keyboardKey?.classList.add(formattedGuess[index].state);
+                // if (currentGuess[index] === solution[index]) {
+                //     tile.setAttribute('data-state', 'correct');
+                //     formattedGuess[index].state = 'correct';
+                //     keyboardKey?.classList.add('correct');
+                //     solution[index] = 'null';
+                // } else if (solution.includes(currentGuess[index])) {
+                //     tile.setAttribute('data-state', 'wrong-location');
+                //     formattedGuess[index].state = 'wrong-location';
+                //     keyboardKey?.classList.add('wrong-location');
+                // } else {
+                //     tile.setAttribute('data-state', 'wrong');
+                //     formattedGuess[index].state = 'wrong';
+                //     keyboardKey?.classList.add('wrong');
+                // }
 
                 if (index === array.length - 1) {
                     tile.addEventListener(
@@ -283,6 +288,41 @@ export const useWordle = (solution: string) => {
                 );
             }, (i * DANCE_ANIMATION_DURATION) / 5);
         });
+    }
+
+    function guessColor(word: string, guess: string, index: number) {
+        // correct (matched) index letter
+        if (guess[index] === word[index]) {
+            return 'correct';
+        }
+
+        let wrongWord = 0;
+        let wrongGuess = 0;
+        for (let i = 0; i < word.length; i++) {
+            // count the wrong (unmatched) letters
+            if (word[i] === guess[index] && guess[i] !== guess[index]) {
+                wrongWord++;
+            }
+            if (i <= index) {
+                if (guess[i] === guess[index] && word[i] !== guess[index]) {
+                    wrongGuess++;
+                }
+            }
+
+            // an unmatched guess letter is wrong if it pairs with
+            // an unmatched word letter
+            if (i >= index) {
+                if (wrongGuess === 0) {
+                    break;
+                }
+                if (wrongGuess <= wrongWord) {
+                    return 'wrong-location';
+                }
+            }
+        }
+
+        // otherwise not any
+        return 'wrong';
     }
 
     return {
