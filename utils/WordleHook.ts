@@ -302,11 +302,32 @@ export const useWordle = (solution: string) => {
             // count the wrong (unmatched) letters
             if (word[i] === guess[index] && guess[i] !== guess[index]) {
                 wrongWord++;
+                /* 
+                -> Keep track if there are any letter (in solution) that matches the current guess index letter
+                
+                MAXIM vs MAMMA => guessWord('MAXIM', 'MAMMA', 2)
+                e.g. Look at index 2 (because index 0 and index 1 has already been validated)
+                Then the end result will be wrongGuess = 1; wrongWord = 1 (because there is only one letter in the solution)
+                that matches the current guess index letter 
+                */
             }
             if (i <= index) {
                 if (guess[i] === guess[index] && word[i] !== guess[index]) {
                     wrongGuess++;
                 }
+
+                /*
+                -> Keep track if there are any letter (in guess word) that matches the current guess index letter 
+                AND is not in the correct position
+                
+                MAXIM vs MAMMA => guessWord('MAXIM', 'MAMMA', 3)
+                e.g. Look at index 3 (which is the second letter 'M' after index 1 and 2)
+                Then the end result will be wrong word = 1 and wrongGuess = 2 (because there is two letter (in guess word) that matches 
+                the current guess index letter (which is on index 2 and 3))
+
+                Now if we take a look, because wrongGuess >= wrongWord, that means there are 'spaces'
+                in the solution that matches the current guess index letter and we can mark it as the wrong-location
+                */
             }
 
             // an unmatched guess letter is wrong if it pairs with
