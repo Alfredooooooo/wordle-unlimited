@@ -309,6 +309,9 @@ export const useWordle = (solution: string) => {
                 e.g. Look at index 2 (because index 0 and index 1 has already been validated)
                 Then the end result will be wrongGuess = 1; wrongWord = 1 (because there is only one letter in the solution)
                 that matches the current guess index letter 
+
+                Now if we take a look, because wrongGuess <= wrongWord, that means there are 'spaces'
+                in the solution that matches the current guess index letter and we can mark it as the wrong-location
                 */
             }
             if (i <= index) {
@@ -325,8 +328,8 @@ export const useWordle = (solution: string) => {
                 Then the end result will be wrong word = 1 and wrongGuess = 2 (because there is two letter (in guess word) that matches 
                 the current guess index letter (which is on index 2 and 3))
 
-                Now if we take a look, because wrongGuess >= wrongWord, that means there are 'spaces'
-                in the solution that matches the current guess index letter and we can mark it as the wrong-location
+                Now if we take a look, because wrongGuess > wrongWord, that means there are no more 'spaces'
+                in the solution that matches the current guess index letter and we can mark it as the wrong
                 */
             }
 
